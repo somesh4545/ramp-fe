@@ -16,6 +16,9 @@ export function App() {
     useTransactionsByEmployee();
   const [isLoading, setIsLoading] = useState(false);
 
+  // if the filter is active that means employee filter need to be called for load more data else simple load more
+  const [activeEmployeeId, setactiveEmployeeId] = useState<string>(EMPTY_EMPLOYEE.id); 
+
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
     [paginatedTransactions, transactionsByEmployee]
@@ -34,10 +37,19 @@ export function App() {
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
       paginatedTransactionsUtils.invalidateData();
-      await transactionsByEmployeeUtils.fetchById(employeeId);
+      await paginatedTransactions.fetchAll();
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils]
   );
+
+  const loadMoreData = async () => {
+    if(!!paginatedTransactions?.nextPage) return;
+    if(activeEmployeeId === EMPTY_EMPLOYEE.id) {
+      await loadAllTransactions();
+    }else{
+      await paginatedTransactionsUtils.fetchAll(activeEmployeeId);
+    }
+  }
 
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
@@ -63,10 +75,12 @@ export function App() {
             label: `${item.firstName} ${item.lastName}`,
           })}
           onChange={async (newValue) => {
-            if (newValue === null) {
+            if (newValue === null || newValue.id === EMPTY_EMPLOYEE.id) {
+              loadAllTransactions();
+              setactiveEmployeeId(EMPTY_EMPLOYEE.id)
               return;
             }
-
+            setactiveEmployeeId(newValue.id);
             await loadTransactionsByEmployee(newValue.id);
           }}
         />
@@ -81,7 +95,7 @@ export function App() {
               className="RampButton"
               disabled={paginatedTransactionsUtils.loading}
               onClick={async () => {
-                await loadAllTransactions();
+                await loadMoreData();
               }}
             >
               View More

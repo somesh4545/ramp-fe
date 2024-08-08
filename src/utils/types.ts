@@ -19,7 +19,8 @@ export type PaginatedResponse<TData> = {
 }
 
 export type PaginatedRequestParams = {
-  page: number | null
+  page: number | null,
+  employeeId?: string,
 }
 
 export type RequestByEmployeeParams = {
