@@ -18,8 +18,14 @@ export type PaginatedResponse<TData> = {
   nextPage: number | null
 }
 
+export type PaginatedRequestMetadata = {
+    employeeId: string,
+    createNewList: boolean
+}
+
 export type PaginatedRequestParams = {
-  page: number | null
+  page: number | null,
+  employeeId?: string,
 }
 
 export type RequestByEmployeeParams = {

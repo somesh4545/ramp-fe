@@ -1,4 +1,4 @@
-import { Employee, PaginatedResponse, Transaction } from "../utils/types"
+import { Employee, PaginatedRequestMetadata, PaginatedResponse, Transaction } from "../utils/types"
 
 type UseTypeBaseResult<TValue> = {
   data: TValue
@@ -7,7 +7,7 @@ type UseTypeBaseResult<TValue> = {
 }
 
 type UseTypeBaseAllResult<TValue> = UseTypeBaseResult<TValue> & {
-  fetchAll: () => Promise<void>
+  fetchAll: (metadata?: PaginatedRequestMetadata )  => Promise<void>
 }
 
 type UseTypeBaseByIdResult<TValue> = UseTypeBaseResult<TValue> & {
