@@ -10,7 +10,7 @@ import mockData from "../mock-data.json"
 
 const TRANSACTIONS_PER_PAGE = 5
 
-const data: { employees: Employee[]; transactions: Transaction[] } = {
+let data: { employees: Employee[]; transactions: Transaction[] } = {
   employees: mockData.employees,
   transactions: mockData.transactions,
 }
@@ -19,6 +19,7 @@ export const getEmployees = (): Employee[] => data.employees
 
 export const getTransactionsPaginated = ({
   page,
+  employeeId
 }: PaginatedRequestParams): PaginatedResponse<Transaction[]> => {
   if (page === null) {
     throw new Error("Page cannot be null")
@@ -27,15 +28,17 @@ export const getTransactionsPaginated = ({
   const start = page * TRANSACTIONS_PER_PAGE
   const end = start + TRANSACTIONS_PER_PAGE
 
-  if (start > data.transactions.length) {
+  let filteredData = data.transactions; // to apply filtering on the data
+  if (start > filteredData.length) {
     throw new Error(`Invalid page ${page}`)
   }
-
-  const nextPage = end < data.transactions.length ? page + 1 : null
-
+  if(!!employeeId) {
+    filteredData = filteredData.filter((transaction) => transaction.employee.id === employeeId)
+  }
+  const nextPage = end < filteredData.length ? page + 1 : null
   return {
     nextPage,
-    data: data.transactions.slice(start, end),
+    data: filteredData.slice(start, end),
   }
 }
 

@@ -1,36 +1,36 @@
 import { useCallback, useState } from "react"
-import { PaginatedRequestParams, PaginatedResponse, Transaction } from "../utils/types"
+import { PaginatedRequestMetadata, PaginatedRequestParams, PaginatedResponse, Transaction } from "../utils/types"
 import { PaginatedTransactionsResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  const { fetchWithCache, loading } = useCustomFetch()
+  const { fetchWithoutCache, loading } = useCustomFetch()
   const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
     Transaction[]
   > | null>(null)
 
-  const fetchAll = useCallback(async (employeeId?: string) => {
+  const fetchAll = useCallback(async (metadata?: PaginatedRequestMetadata) => {
     const requestBody = <PaginatedRequestParams> {
-      page: paginatedTransactions === null ? 0 : paginatedTransactions.nextPage,
+      page: paginatedTransactions === null || (!!metadata && !!metadata.createNewList) ? 0 : paginatedTransactions.nextPage,
     }
-    if(!!employeeId) {
-      requestBody.employeeId = employeeId
+    if(metadata && !!metadata.employeeId ) {
+      requestBody.employeeId = metadata.employeeId
     }
-    console.log(requestBody)
-    const response = await fetchWithCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
+
+    const response = await fetchWithoutCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
       "paginatedTransactions",
       requestBody
     )
 
     setPaginatedTransactions((previousResponse) => {
-      if (response === null || previousResponse === null) {
+      if (response === null || previousResponse === null || (metadata && !!metadata.createNewList)) {
         return response
       }
       return { data: [ ...previousResponse.data ,...response.data], nextPage: response.nextPage }
     })
-  }, [fetchWithCache, paginatedTransactions])
+  }, [fetchWithoutCache, paginatedTransactions])
 
-  const invalidateData = useCallback(() => {
+  const invalidateData = useCallback( () => {
     setPaginatedTransactions(null)
   }, [])
 
