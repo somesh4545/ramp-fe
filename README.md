@@ -4,6 +4,13 @@ https://n8p88n.csb.app/
 # Bug fixes Documentation
 https://docs.google.com/document/d/e/2PACX-1vTgoc-Asv4XkUVa82Wh85FAV3k-YfxVzKssWJWoPPzi4ZfcYAl1t5iaC0yWBCKzfBvy8TH2ttDCqOKU/pub
 
+# Note
+1. While fetching employee transactions—either all transactions or those filtered by a specific employee ID—the pagination logic remains consistent. To avoid code duplication, I've refactored the paginated transaction function to handle both cases by checking whether an employee ID is provided.
+2. The metadata passed now includes a flag indicating whether to consider previous transactions. This adjustment was necessary because the invalidateData function doesn’t immediately update the state, resulting in the old data being included in the list. I chose to implement the flag-based approach, which is more reliable than using a timeout for state updates.
+
+## Github: 
+<a href="https://github.com/somesh4545/ramp-fe">Link</a>
+
 # Instructions
 
 Welcome to Ramp's frontend interview challenge.
